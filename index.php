@@ -24,6 +24,7 @@ function main_handler($event, $context)
     $event->body = json_decode($event->body);
     try {
         $skill = new Skill($event, $context);
+        var_dump($skill);
         //基本校验
         if (empty($skill) || !check_skill($skill, $dkconfig)) {
             echo __FILE__ . __LINE__ . ":" . "skill invalid";
@@ -88,6 +89,7 @@ function intentRequestProcess($skill, $dkconfig)
             $failedOutputSpeech = $confg_slot['failedOutputSpeech'];
             $failedOutputText = $confg_slot['failedOutputText'];
             $slotSupportedValues = $confg_slot['supportedValues'];
+            var_dump($slotSupportedValues);
             //必选检查
             if (!isset($intent->slots[$slotName])) {
                 echo __FILE__ . __LINE__ . ":" . "slot not found:$slotName\n";
@@ -96,15 +98,16 @@ function intentRequestProcess($skill, $dkconfig)
 
             //值范围检查
             $slot_first_value = $skill->get_slot_first_value($slotName);
+            var_dump($slot_first_value);
             if (!empty($slotSupportedValues) && !in_array($slot_first_value, $slotSupportedValues)) {
-                echo __FILE__ . __LINE__ . ":" . "slot value invalid:$slotName\n";
+                echo __FILE__ . __LINE__ . ":" . "值范围检查slot value invalid:$slotName\n";
                 return build_slot_elicit_failed_response($dkconfig, $failedOutputSpeech, $slotName, null, $failedOutputText);
             }
 
             //未传值
             $format_value = format_request_dk_value($slotName, $slot_first_value);
             if (empty($format_value)) {
-                echo __FILE__ . __LINE__ . ":" . "slot value invalid:$slotName\n";
+                echo __FILE__ . __LINE__ . ":" . "未传值slot value invalid:$slotName\n";
                 return build_slot_elicit_failed_response($dkconfig, $failedOutputSpeech, $slotName, null, $failedOutputText);
             }
 
@@ -112,11 +115,14 @@ function intentRequestProcess($skill, $dkconfig)
         }
         $pic_class = $require_slots['pic_class'];
         //选择的图片
-        $successSpeach = $dkconfig["skillSuccessOutputSpeech"]["恭喜"];
-        $successText = $dkconfig["skillSuccessOutputText"]["恭喜"];
+        $successSpeach = $dkconfig["skillSuccessOutputSpeech"]["图片"];
+        $successText = $dkconfig["skillSuccessOutputText"]["图片"];
         $speak_info = $successSpeach['text'];
         $text_info = $successText['description'];
-        $first_hk = 100;
+
+
+        $pic_name = 100;
+        $pic_url = "图片地址";
         eval("\$speak_info = \"$speak_info\";");
         eval("\$text_info = \"$text_info\";");
         if (!empty($speak_info)) {

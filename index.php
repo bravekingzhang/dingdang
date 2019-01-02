@@ -3,6 +3,7 @@ require_once "tsk/Skill.php";
 require_once "tsk/SkillRsp.php";
 require_once "dkcommon.php";
 require_once "config.php";
+require_once "dataConfig.php";
 
 function main_handler($event, $context)
 {
@@ -10,7 +11,9 @@ function main_handler($event, $context)
     var_dump($context);
 
     global $config;
+    global $data_config;
     $dkconfig = $config['dkconfig'];
+    $dataConfig = $data_config;
     if (!isset($event->header) || !isset($event->body)) {
         echo __FILE__ . __LINE__ . ":" . "params not found\n";
         return build_skill_failed_response($dkconfig, 'signInvalid');
@@ -35,7 +38,7 @@ function main_handler($event, $context)
         switch ($skill->request->type) {
             case 'IntentRequest':
                 echo __FILE__ . __LINE__ . ":" . "IntentRequest...\n";
-                $result = intentRequestProcess($skill, $dkconfig);
+                $result = intentRequestProcess($skill, $dkconfig, $dataConfig);
                 break;
             case 'LaunchRequest':
                 echo __FILE__ . __LINE__ . ":" . "LaunchRequest...\n";
@@ -43,7 +46,7 @@ function main_handler($event, $context)
                 break;
             default:
                 echo __FILE__ . __LINE__ . ":" . "request type not found,default IntentRequest...\n";
-                $result = intentRequestProcess($skill, $dkconfig);
+                $result = intentRequestProcess($skill, $dkconfig, $dataConfig);
                 break;
         }
 
@@ -63,7 +66,7 @@ function launchRequestProcess($skill, $dkconfig)
     return build_skill_failed_response($dkconfig, 'skillIdInvalid');
 }
 
-function intentRequestProcess($skill, $dkconfig)
+function intentRequestProcess($skill, $dkconfig, $dataConfig)
 {
     echo __FILE__ . __LINE__ . ":" . "intent process start...\n";
     try {
@@ -89,7 +92,6 @@ function intentRequestProcess($skill, $dkconfig)
             $failedOutputSpeech = $confg_slot['failedOutputSpeech'];
             $failedOutputText = $confg_slot['failedOutputText'];
             $slotSupportedValues = $confg_slot['supportedValues'];
-            var_dump($slotSupportedValues);
             //必选检查
             if (!isset($intent->slots[$slotName])) {
                 echo __FILE__ . __LINE__ . ":" . "slot not found:$slotName\n";
@@ -98,7 +100,6 @@ function intentRequestProcess($skill, $dkconfig)
 
             //值范围检查
             $slot_first_value = $skill->get_slot_first_value($slotName);
-            var_dump($slot_first_value);
             if (!empty($slotSupportedValues) && !in_array($slot_first_value, $slotSupportedValues)) {
                 echo __FILE__ . __LINE__ . ":" . "值范围检查slot value invalid:$slotName\n";
                 return build_slot_elicit_failed_response($dkconfig, $failedOutputSpeech, $slotName, null, $failedOutputText);
@@ -120,9 +121,11 @@ function intentRequestProcess($skill, $dkconfig)
         $speak_info = $successSpeach['text'];
         $text_info = $successText['description'];
 
+        $item_give = array_rand($dataConfig[$pic_class], 1);
+        var_dump($item_give);
 
-        $pic_name = 100;
-        $pic_url = "图片地址";
+        $pic_name = $item_give;
+        $pic_url = $dataConfig[$pic_class][$pic_name];
         eval("\$speak_info = \"$speak_info\";");
         eval("\$text_info = \"$text_info\";");
         if (!empty($speak_info)) {

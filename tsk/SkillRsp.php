@@ -16,21 +16,26 @@ class SkillRsp
     }
 }
 
-function build_skill_success_response($config, $speech, $outText = NULL)
+function build_skill_success_response($config, $speech, $outText = null, $pic_url = null)
 {
     $reponse['outputSpeech'] = new OutputSpeech($speech);
     //控制是否轮
-    $reponse['shouldEndSession'] = true;
+    $reponse['shouldEndSession'] = false;
 
     $skillBody = new SkillRsp();
     $rsp = new Response($reponse);
-    $directiveCfg = $config['successDirective'];
     $directiveCfg["token"] = get_token();
     $displayDirective = new DisplayRenderTemplate($directiveCfg);
     unset($displayDirective->template->backgroundAudio);
     unset($displayDirective->template->url);
     unset($displayDirective->template->listItems);
     unset($displayDirective->template->backgroundImage->contentDescription);
+    if (!empty($pic_url)) {
+        $displayDirective->template->backgroundImage->contentDescription = "--";
+        $displayDirective->template->backgroundImage->source->url = $pic_url;
+        $displayDirective->template->type = "NewsBodyTemplate1";
+    }
+
     if (!empty($outText)) {
         $displayDirective->template->textContent = new TextContentObj($outText);
     }

@@ -47,7 +47,7 @@ $config['dkconfig'] = array(
         ///todo 输出一张图片，并且继续下一张
     ),
     "skillSuccessOutputText" => array(
-        "图片" => array("title" => "看图识话", "description" => '$pic_name')
+        "图片" => array("title" => "", "description" => '$pic_name')
     ),
     "skillFailedOutputSpeech" => array(
         "抱歉" => array("type" => "PlainText", "text" => "对不起，我不是很理解你说的。"),

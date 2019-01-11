@@ -131,7 +131,7 @@ function intentRequestProcess($skill, $dkconfig, $dataConfig)
         if (!empty($speak_info)) {
             $successSpeach['text'] = $speak_info;
             $successText['description'] = $text_info;
-            return build_skill_success_response($dkconfig, $successSpeach, $successText);
+            return build_skill_success_response($dkconfig, $successSpeach, $successText, $pic_url);
         }
     } catch (Exception $e) {
         echo "failed : " . $e . getMessage();
